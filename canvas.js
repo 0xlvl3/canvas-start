@@ -47,10 +47,32 @@ for (let i = 0; i < 100; i++) {
   c.arc(x, y, 30, 0, Math.PI * 2, false);
   c.strokeStyle = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(
     Math.random() * 255
-  )}, ${Math.floor(Math.random() * 255)}, 0.8)`;
+  )}, ${Math.floor(Math.random() * 255Math.floor(Math.random() * 255)}, 0.8)`;
   c.stroke();
 }
 */
+
+let colorArray = ["#FF4858", "#1B7F79", "#00CCC0", "#72F2EB", "#747F7F"];
+
+const mouse = {
+  x: undefined,
+  y: undefined,
+};
+
+const maxRadius = 40;
+const minRadius = 5;
+
+window.addEventListener("mousemove", (e) => {
+  mouse.x = e.x;
+  mouse.y = e.y;
+});
+
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  init();
+});
 
 function Circle(x, y, dx, dy, radius) {
   this.x = x;
@@ -58,12 +80,14 @@ function Circle(x, y, dx, dy, radius) {
   this.dx = dx;
   this.dy = dy;
   this.radius = radius;
+  this.minRadius = radius;
+  this.color = colorArray[Math.floor(Math.random() * colorArray.length)];
 
   this.draw = function () {
     c.beginPath();
     c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-    c.strokeStyle = `rgba(255, 0, 0, 0.8)`;
-    c.stroke();
+    c.fill();
+    c.fillStyle = this.color;
   };
 
   this.update = function () {
@@ -78,23 +102,40 @@ function Circle(x, y, dx, dy, radius) {
     this.x += this.dx;
     this.y += this.dy;
 
+    //interactivity
+    if (
+      mouse.x - this.x < 50 &&
+      mouse.x - this.x > -50 &&
+      mouse.y - this.y < 50 &&
+      mouse.y - this.y > -50
+    ) {
+      if (this.radius < maxRadius) {
+        this.radius += 1;
+      }
+    } else if (this.radius > this.minRadius) {
+      this.radius -= 1;
+    }
+
     this.draw();
   };
 }
 
-const circleArray = [];
+let circleArray = [];
 
-for (let i = 0; i < 125; i++) {
-  let radius = 30;
-  //x and y we take the width and height and we - raidus * 2 then + radius so that our circles don't spawn outside of our canvas specified width and height
-  let x = Math.random() * (innerWidth - radius * 2) + radius;
-  let y = Math.random() * (innerHeight - radius * 2) + radius;
-  let dx = (Math.random() - 0.5) * 10;
-  let dy = (Math.random() - 0.5) * 10;
+function init() {
+  circleArray = [];
 
-  circleArray.push(new Circle(x, y, dx, dy, radius));
+  for (let i = 0; i < 800; i++) {
+    let radius = Math.random() * 3 + 1;
+    //x and y we take the width and height and we - raidus * 2 then + radius so that our circles don't spawn outside of our canvas specified width and height
+    let x = Math.random() * (innerWidth - radius * 2) + radius;
+    let y = Math.random() * (innerHeight - radius * 2) + radius;
+    let dx = (Math.random() - 0.5) * 3;
+    let dy = (Math.random() - 0.5) * 3;
+
+    circleArray.push(new Circle(x, y, dx, dy, radius));
+  }
 }
-console.log(circleArray);
 
 /**
  * creates a loop that is animated
@@ -108,4 +149,5 @@ function animate() {
   }
 }
 
+init();
 animate();
